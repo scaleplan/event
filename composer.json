@@ -1,0 +1,12 @@
+{
+    "name": "scaleplan/event",
+    "description": "Scaleplan event model",
+    "autoload": {
+        "psr-4": {
+            "Scaleplan\\Event\\": "src/"
+        }
+    },
+    "require": {
+        "php": ">=7.0"
+    }
+}
