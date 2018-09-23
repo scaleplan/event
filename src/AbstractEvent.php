@@ -2,6 +2,8 @@
 
 namespace Scaleplan\Event;
 
+use Scaleplan\Event\Exceptions\EventSendException;
+
 /**
  * Class AbstractEvent
  *
@@ -39,6 +41,31 @@ abstract class AbstractEvent
     }
 
     /**
+     * @param string $url
+     * @param array $data
+     *
+     * @throws \Scaleplan\Event\Exceptions\EventSendException
+     */
+    public static function sendTo(string $url, array $data = []) : void
+    {
+        $content = ['event' => static::NAME, 'data' => $data];
+
+        // use key 'http' even if you send the request to https://...
+        $options = [
+            'http' => [
+                'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
+                'method'  => 'POST',
+                'content' => json_encode($content, JSON_UNESCAPED_UNICODE),
+            ]
+        ];
+        $context  = stream_context_create($options);
+        $result = file_get_contents($url, false, $context);
+        if ($result === false) {
+            throw new EventSendException();
+        }
+    }
+
+    /**
      * @var array
      */
     protected $data;
@@ -46,7 +73,7 @@ abstract class AbstractEvent
     /**
      * Event handler priority executor
      */
-    public function run() : void
+    protected function run() : void
     {
     }
 }
