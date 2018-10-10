@@ -3,7 +3,7 @@
 namespace Scaleplan\Event\Exceptions;
 
 /**
- * Class AbstractException
+ * Class KafkaException
  *
  * @package Scaleplan\Event\Exceptions
  */
@@ -12,7 +12,7 @@ class AbstractException extends \Exception
     public const MESSAGE = 'Event error.';
 
     /**
-     * AbstractException constructor.
+     * KafkaException constructor.
      *
      * @param int $code
      * @param \Throwable|null $previous
