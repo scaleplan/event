@@ -36,7 +36,6 @@ abstract class AbstractEvent
             self::$clearInstance = new static();
         }
 
-        self::$clearInstance->data = $data;
         self::$clearInstance->run();
     }
 
@@ -46,7 +45,7 @@ abstract class AbstractEvent
      *
      * @throws \Scaleplan\Event\Exceptions\EventSendException
      */
-    public static function sendTo(string $url, array $data = []) : void
+    public static function sendByHttp(string $url, array $data = []) : void
     {
         $content = ['event' => static::NAME, 'data' => $data];
 
