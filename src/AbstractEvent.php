@@ -3,6 +3,8 @@
 namespace Scaleplan\Event;
 
 use Scaleplan\Event\Exceptions\EventSendException;
+use Scaleplan\Kafka\Kafka;
+use Scaleplan\Kafka\Payload;
 
 /**
  * Class AbstractEvent
@@ -12,6 +14,8 @@ use Scaleplan\Event\Exceptions\EventSendException;
 abstract class AbstractEvent
 {
     public const NAME = 'Abstract';
+
+    public const KAFKA_TOPIC = null;
 
     /**
      * @var \Scaleplan\Event\AbstractEvent
@@ -32,11 +36,11 @@ abstract class AbstractEvent
             return;
         }
 
-        if (!self::$clearInstance) {
-            self::$clearInstance = new static();
+        if (!static::$clearInstance) {
+            static::$clearInstance = new static();
         }
 
-        self::$clearInstance->run();
+        static::$clearInstance->run();
     }
 
     /**
@@ -45,7 +49,7 @@ abstract class AbstractEvent
      *
      * @throws \Scaleplan\Event\Exceptions\EventSendException
      */
-    public static function sendByHttp(string $url, array $data = []) : void
+    public static function sendByHttp(string $url, array $data) : void
     {
         $content = ['event' => static::NAME, 'data' => $data];
 
@@ -62,6 +66,12 @@ abstract class AbstractEvent
         if ($result === false) {
             throw new EventSendException();
         }
+    }
+
+    public static function sendByKafka(array $data) : void
+    {
+        $kafka = Kafka::getInstance();
+        $kafka->produce(static::KAFKA_TOPIC ?? static::NAME, $data);
     }
 
     /**
