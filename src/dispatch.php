@@ -3,7 +3,6 @@
 namespace Scaleplan\Event;
 
 use Scaleplan\Event\Exceptions\ClassIsNotEventException;
-use Symfony\Component\Yaml\Yaml;
 
 /**
  * Class EventDispatcher
@@ -18,11 +17,11 @@ class EventDispatcher
     protected static $events = [];
 
     /**
-     * @param string $configPath
+     * @param array $events
      */
-    public static function init(string $configPath)
+    public static function init(array $events)
     {
-        static::$events = Yaml::parse(file_get_contents($configPath));
+        static::$events = $events;
     }
 
     /**
@@ -30,9 +29,10 @@ class EventDispatcher
      * @param array $data
      *
      * @return bool
+     *
      * @throws ClassIsNotEventException
      */
-    public static function dispatch(string $eventName, array $data = [])
+    public static function dispatch(string $eventName, array $data = []) : bool
     {
         if (empty($eventClass = static::$events[$eventName])) {
             return false;
@@ -43,6 +43,7 @@ class EventDispatcher
         }
 
         $eventClass::dispatch($data);
+        return true;
     }
 }
 
@@ -50,9 +51,11 @@ class EventDispatcher
  * @param string $eventName
  * @param array $data
  *
+ * @return bool
+ *
  * @throws ClassIsNotEventException
  */
-function dispatch(string $eventName, array $data = [])
+function dispatch(string $eventName, array $data = []) : bool
 {
-    EventDispatcher::dispatch($eventName, $data);
+    return EventDispatcher::dispatch($eventName, $data);
 }

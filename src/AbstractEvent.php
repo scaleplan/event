@@ -53,7 +53,6 @@ abstract class AbstractEvent
     {
         $content = ['event' => static::NAME, 'data' => $data];
 
-        // use key 'http' even if you send the request to https://...
         $options = [
             'http' => [
                 'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
