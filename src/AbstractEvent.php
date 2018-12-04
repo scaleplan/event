@@ -2,9 +2,10 @@
 
 namespace Scaleplan\Event;
 
-use Scaleplan\Event\Exceptions\EventSendException;
+use Lmc\HttpConstants\Header;
+use Scaleplan\Event\Exceptions\DataNotSupportedException;
+use Scaleplan\Http\Request;
 use Scaleplan\Kafka\Kafka;
-use Scaleplan\Kafka\Payload;
 
 /**
  * Class AbstractEvent
@@ -32,7 +33,7 @@ abstract class AbstractEvent
         if ($data) {
             $event = new static();
             $event->data = $data;
-            $event->run();
+            $event->handler();
             return;
         }
 
@@ -40,37 +41,45 @@ abstract class AbstractEvent
             static::$clearInstance = new static();
         }
 
-        static::$clearInstance->run();
+        static::$clearInstance->handler();
     }
 
     /**
      * @param string $url
-     * @param array $data
+     * @param string|null $token
      *
-     * @throws \Scaleplan\Event\Exceptions\EventSendException
+     * @throws \Scaleplan\Http\Exceptions\RemoteServiceNotAvailableException
      */
-    public static function sendByHttp(string $url, array $data) : void
+    protected function sendByHttp(string $url, string $token = null) : void
     {
-        $content = ['event' => static::NAME, 'data' => $data];
+        $content = ['event' => static::NAME, 'data' => $this->data];
 
-        $options = [
-            'http' => [
-                'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
-                'method'  => 'POST',
-                'content' => json_encode($content, JSON_UNESCAPED_UNICODE),
-            ]
-        ];
-        $context  = stream_context_create($options);
-        $result = file_get_contents($url, false, $context);
-        if ($result === false) {
-            throw new EventSendException();
+        $request = new Request($url, $content);
+        if ($token) {
+            $request->addHeader(Header::AUTHORIZATION, $token);
         }
+
+        $request->send();
     }
 
-    public static function sendByKafka(array $data) : void
+    protected function sendAsyncByKafka() : void
     {
         $kafka = Kafka::getInstance();
-        $kafka->produce(static::KAFKA_TOPIC ?? static::NAME, $data);
+        $kafka->produce(static::KAFKA_TOPIC ?? static::NAME, $this->data);
+    }
+
+    /**
+     * @param \PDO $connection
+     *
+     * @throws DataNotSupportedException
+     */
+    public function sendAsyncByDb(\PDO $connection) : void
+    {
+        if ($this->data) {
+            throw new DataNotSupportedException();
+        }
+
+        $connection->exec('NOTIFY ' . static::NAME);
     }
 
     /**
@@ -81,7 +90,7 @@ abstract class AbstractEvent
     /**
      * Event handler priority executor
      */
-    protected function run() : void
+    protected function handler() : void
     {
     }
 }

@@ -8,6 +8,7 @@
     },
     "require": {
         "php": ">=7.0",
-        "scaleplan/kafka": "dev-master"
+        "scaleplan/kafka": "dev-master",
+        "scaleplan/http": "dev-master"
     }
 }
