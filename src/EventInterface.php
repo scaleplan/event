@@ -21,5 +21,5 @@ interface EventInterface
     /**
      * Event handler priority executor
      */
-    public function run() : void;
+    public function handler() : void;
 }

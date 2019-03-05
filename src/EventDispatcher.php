@@ -3,6 +3,7 @@
 namespace Scaleplan\Event;
 
 use Scaleplan\Event\Exceptions\ClassIsNotEventException;
+use Scaleplan\Event\Exceptions\EventNotFoundException;
 
 /**
  * Class EventDispatcher
@@ -28,21 +29,71 @@ class EventDispatcher
      * @param string $eventName
      * @param array $data
      *
-     * @return bool
+     * @return string
      *
      * @throws ClassIsNotEventException
+     * @throws EventNotFoundException
      */
-    public static function dispatch(string $eventName, array $data = []) : bool
+    protected static function getEventClass(string $eventName, array $data = []) : string
     {
         if (empty($eventClass = static::$events[$eventName])) {
-            return false;
+            throw new EventNotFoundException($eventName);
         }
 
-        if (!($eventClass instanceof EventInterface)) {
+        if (!class_exists($eventClass) || !is_subclass_of($eventClass, EventInterface::class)) {
             throw new ClassIsNotEventException();
         }
 
-        $eventClass::dispatch($data);
-        return true;
+        return $eventClass;
     }
+
+    /**
+     * @param string $eventName
+     * @param array $data
+     *
+     * @throws ClassIsNotEventException
+     */
+    public static function dispatch(string $eventName, array $data = []) : void
+    {
+        /** @var EventInterface $eventClass */
+        $eventClass = static::eventNameCheck($eventName, $data);
+        $eventClass::dispatch($data);
+    }
+
+    /**
+     * @param string $eventName
+     * @param array $data
+     *
+     * @throws ClassIsNotEventException
+     */
+    public static function dispatchAsync(string $eventName, array $data = []) : void
+    {
+        $eventClass = static::eventNameCheck($eventName, $data);
+        register_shutdown_function(function () use ($eventClass, $data) {
+            /** @var EventInterface $eventClass */
+            $eventClass::dispatch($data);
+        });
+    }
+}
+
+/**
+ * @param string $eventName
+ * @param array $data
+ *
+ * @throws ClassIsNotEventException
+ */
+function dispatch(string $eventName, array $data = []) : void
+{
+    EventDispatcher::dispatch($eventName, $data);
+}
+
+/**
+ * @param string $eventName
+ * @param array $data
+ *
+ * @throws ClassIsNotEventException
+ */
+function dispatch_async(string $eventName, array $data = []) : void
+{
+    EventDispatcher::dispatchAsync($eventName, $data);
 }

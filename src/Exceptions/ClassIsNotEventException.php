@@ -11,5 +11,18 @@ use Scaleplan\Event\EventInterface;
  */
 class ClassIsNotEventException extends AbstractException
 {
-    public const MESSAGE = 'Class ' . __CLASS__ . ' must implements ' . EventInterface::class;
+    public const MESSAGE = 'Class :class must implements ' . EventInterface::class;
+
+    /**
+     * ClassIsNotEventException constructor.
+     *
+     * @param string $className
+     * @param int $code
+     * @param \Throwable|null $previous
+     */
+    public function __construct(string $className, \int $code = 0, \Throwable $previous = null)
+    {
+        parent::__construct($code, $previous);
+        $this->message = str_replace(':class', $className, static::MESSAGE);
+    }
 }

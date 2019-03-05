@@ -24,6 +24,11 @@ abstract class AbstractEvent
     public static $clearInstance;
 
     /**
+     * @var array
+     */
+    protected $data;
+
+    /**
      * Trigger event
      *
      * @param array $data
@@ -83,14 +88,9 @@ abstract class AbstractEvent
     }
 
     /**
-     * @var array
-     */
-    protected $data;
-
-    /**
      * Event handler priority executor
      */
-    protected function handler() : void
+    public function handler() : void
     {
     }
 }
