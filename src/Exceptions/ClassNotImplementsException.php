@@ -2,16 +2,14 @@
 
 namespace Scaleplan\Event\Exceptions;
 
-use Scaleplan\Event\EventInterface;
-
 /**
- * Class ClassIsNotEventException
+ * Class ClassNotImplementsException
  *
  * @package Scaleplan\Event\Exceptions
  */
-class ClassIsNotEventException extends AbstractException
+class ClassNotImplementsException extends AbstractException
 {
-    public const MESSAGE = 'Class :class must implements ' . EventInterface::class;
+    public const MESSAGE = 'Class :class must implements required interface.';
 
     /**
      * ClassIsNotEventException constructor.

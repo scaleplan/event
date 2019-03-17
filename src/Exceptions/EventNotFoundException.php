@@ -2,8 +2,6 @@
 
 namespace Scaleplan\Event\Exceptions;
 
-use Scaleplan\Event\EventInterface;
-
 /**
  * Class EventNotFoundException
  *

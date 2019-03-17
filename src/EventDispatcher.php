@@ -2,8 +2,8 @@
 
 namespace Scaleplan\Event;
 
-use Scaleplan\Event\Exceptions\ClassIsNotEventException;
-use Scaleplan\Event\Exceptions\EventNotFoundException;
+use Scaleplan\Event\Exceptions\ClassNotImplementsEventInterfaceException;
+use Scaleplan\Event\Interfaces\EventInterface;
 
 /**
  * Class EventDispatcher
@@ -20,80 +20,65 @@ class EventDispatcher
     /**
      * @param array $events
      */
-    public static function init(array $events)
+    public static function init(array $events) : void
     {
         static::$events = $events;
     }
 
     /**
-     * @param string $eventName
-     * @param array $data
+     * @param string $className
      *
-     * @return string
-     *
-     * @throws ClassIsNotEventException
-     * @throws EventNotFoundException
+     * @throws ClassNotImplementsEventInterfaceException
      */
-    protected static function getEventClass(string $eventName, array $data = []) : string
+    protected static function eventClassCheck(\string $className) : void
     {
-        if (empty($eventClass = static::$events[$eventName])) {
-            throw new EventNotFoundException($eventName);
+        if (!class_exists($className) || !is_subclass_of($className, EventInterface::class)) {
+            throw new ClassNotImplementsEventInterfaceException($className);
         }
-
-        if (!class_exists($eventClass) || !is_subclass_of($eventClass, EventInterface::class)) {
-            throw new ClassIsNotEventException();
-        }
-
-        return $eventClass;
     }
 
     /**
-     * @param string $eventName
-     * @param array $data
+     * @param string $className
+     * @param object|null $object
      *
-     * @throws ClassIsNotEventException
+     * @throws ClassNotImplementsEventInterfaceException
      */
-    public static function dispatch(string $eventName, array $data = []) : void
+    public static function dispatch(\string $className, \object $object = null) : void
     {
-        /** @var EventInterface $eventClass */
-        $eventClass = static::eventNameCheck($eventName, $data);
-        $eventClass::dispatch($data);
+        /** @var EventInterface $className */
+        static::eventClassCheck($className);
+        $className::dispatch($object);
     }
 
     /**
-     * @param string $eventName
-     * @param array $data
-     *
-     * @throws ClassIsNotEventException
+     * @param string $className
+     * @param object|null $object
      */
-    public static function dispatchAsync(string $eventName, array $data = []) : void
+    public static function dispatchAsync(\string $className, \object $object = null) : void
     {
-        $eventClass = static::eventNameCheck($eventName, $data);
-        register_shutdown_function(function () use ($eventClass, $data) {
-            /** @var EventInterface $eventClass */
-            $eventClass::dispatch($data);
+        register_shutdown_function(function () use ($className, $object) {
+            /** @var EventInterface $className */
+            $className::dispatch($object);
         });
     }
 }
 
 /**
  * @param string $eventName
- * @param array $data
+ * @param object|null $object
  *
- * @throws ClassIsNotEventException
+ * @throws ClassNotImplementsEventInterfaceException
  */
-function dispatch(string $eventName, array $data = []) : void
+function dispatch(string $eventName, \object $object = null) : void
 {
-    EventDispatcher::dispatch($eventName, $data);
+    EventDispatcher::dispatch($eventName, $object);
 }
 
 /**
  * @param string $eventName
- * @param array $data
- *
- * @throws ClassIsNotEventException
+ * @param object|null $object
  */
-function dispatch_async(string $eventName, array $data = []) : void
+function dispatch_async(string $eventName, \object $object = null) : void
 {
-    EventDispatcher::dispatchAsync($eventName, $data);
+    EventDispatcher::dispatchAsync($eventName, $object);
 }

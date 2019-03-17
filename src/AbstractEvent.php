@@ -2,95 +2,66 @@
 
 namespace Scaleplan\Event;
 
-use Lmc\HttpConstants\Header;
-use Scaleplan\Event\Exceptions\DataNotSupportedException;
-use Scaleplan\Http\Request;
-use Scaleplan\Kafka\Kafka;
+use Scaleplan\Event\Exceptions\ClassNotImplementsListenerInterfaceException;
+use Scaleplan\Event\Interfaces\EventInterface;
+use Scaleplan\Event\Interfaces\ListenerInterface;
 
 /**
  * Class AbstractEvent
  *
  * @package Scaleplan\Event
  */
-abstract class AbstractEvent
+class AbstractEvent implements EventInterface
 {
-    public const NAME = 'Abstract';
+    protected const PRIORITY_LABEL = 'priority';
+    protected const DATA_LABEL     = 'data';
 
-    public const KAFKA_TOPIC = null;
-
-    /**
-     * @var \Scaleplan\Event\AbstractEvent
-     */
-    public static $clearInstance;
+    public const PRIORY_HIGH   = 0;
+    public const PRIORY_MEDIUM = 1;
+    public const PRIORY_LOW    = 2;
 
     /**
      * @var array
      */
-    protected $data;
+    protected static $listeners = [];
 
     /**
-     * Trigger event
-     *
+     * @param string $className
+     * @param string $priority
      * @param array $data
-     */
-    public static function dispatch(array $data = []) : void
-    {
-        if ($data) {
-            $event = new static();
-            $event->data = $data;
-            $event->handler();
-            return;
-        }
-
-        if (!static::$clearInstance) {
-            static::$clearInstance = new static();
-        }
-
-        static::$clearInstance->handler();
-    }
-
-    /**
-     * @param string $url
-     * @param string|null $token
      *
-     * @throws \Scaleplan\Http\Exceptions\RemoteServiceNotAvailableException
+     * @throws ClassNotImplementsListenerInterfaceException
      */
-    protected function sendByHttp(string $url, string $token = null) : void
+    public static function addListener(string $className, string $priority, array $data = []) : void
     {
-        $content = ['event' => static::NAME, 'data' => $this->data];
-
-        $request = new Request($url, $content);
-        if ($token) {
-            $request->addHeader(Header::AUTHORIZATION, $token);
+        if (!class_exists($className) || !is_subclass_of($className, ListenerInterface::class)) {
+            throw new ClassNotImplementsListenerInterfaceException($className);
         }
 
-        $request->send();
-    }
-
-    protected function sendAsyncByKafka() : void
-    {
-        $kafka = Kafka::getInstance();
-        $kafka->produce(static::KAFKA_TOPIC ?? static::NAME, $this->data);
+        static::$listeners[$className] = [static::DATA_LABEL => $data, static::PRIORITY_LABEL => $priority];
     }
 
     /**
-     * @param \PDO $connection
-     *
-     * @throws DataNotSupportedException
+     * @param string $className
      */
-    public function sendAsyncByDb(\PDO $connection) : void
+    public static function removeListener(string $className) : void
     {
-        if ($this->data) {
-            throw new DataNotSupportedException();
-        }
-
-        $connection->exec('NOTIFY ' . static::NAME);
+        unset(static::$listeners[$className]);
     }
 
     /**
-     * Event handler priority executor
+     * @param object|null $object
      */
-    public function handler() : void
+    public static function dispatch(?\object $object) : void
     {
+        uasort(static::$listeners, function (int $a, int $b) {
+            return ($a[static::PRIORITY_LABEL] <=> $b[static::PRIORITY_LABEL]);
+        });
+        foreach (static::$listeners as $class => $data) {
+            /** @var ListenerInterface $listener */
+            $listener = new $class(...$data);
+            $listener->setObject($object);
+            $listener->handler();
+        }
     }
 }
