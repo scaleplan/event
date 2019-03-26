@@ -2,6 +2,9 @@
     "name": "scaleplan/event",
     "description": "Scaleplan event model",
     "autoload": {
+        "files": [
+            "src/functions.php"
+        ],
         "psr-4": {
             "Scaleplan\\Event\\": "src/"
         }

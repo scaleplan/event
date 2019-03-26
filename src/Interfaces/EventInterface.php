@@ -21,5 +21,5 @@ interface EventInterface
      */
     public static function removeListener(string $className) : void;
 
-    public static function dispatch(?\object $object) : void;
+    public static function dispatch(?object $object) : void;
 }

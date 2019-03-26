@@ -18,7 +18,7 @@ class ClassNotImplementsException extends AbstractException
      * @param int $code
      * @param \Throwable|null $previous
      */
-    public function __construct(string $className, \int $code = 0, \Throwable $previous = null)
+    public function __construct(string $className, int $code = 0, \Throwable $previous = null)
     {
         parent::__construct($code, $previous);
         $this->message = str_replace(':class', $className, static::MESSAGE);

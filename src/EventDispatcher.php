@@ -30,7 +30,7 @@ class EventDispatcher
      *
      * @throws ClassNotImplementsEventInterfaceException
      */
-    protected static function eventClassCheck(\string $className) : void
+    protected static function eventClassCheck(string $className) : void
     {
         if (!class_exists($className) || !is_subclass_of($className, EventInterface::class)) {
             throw new ClassNotImplementsEventInterfaceException($className);
@@ -43,7 +43,7 @@ class EventDispatcher
      *
      * @throws ClassNotImplementsEventInterfaceException
      */
-    public static function dispatch(\string $className, \object $object = null) : void
+    public static function dispatch(string $className, object $object = null) : void
     {
         /** @var EventInterface $className */
         static::eventClassCheck($className);
@@ -54,31 +54,11 @@ class EventDispatcher
      * @param string $className
      * @param object|null $object
      */
-    public static function dispatchAsync(\string $className, \object $object = null) : void
+    public static function dispatchAsync(string $className, object $object = null) : void
     {
         register_shutdown_function(function () use ($className, $object) {
             /** @var EventInterface $className */
             $className::dispatch($object);
         });
     }
-}
-
-/**
- * @param string $eventName
- * @param object|null $object
- *
- * @throws ClassNotImplementsEventInterfaceException
- */
-function dispatch(string $eventName, \object $object = null) : void
-{
-    EventDispatcher::dispatch($eventName, $object);
-}
-
-/**
- * @param string $eventName
- * @param object|null $object
- */
-function dispatch_async(string $eventName, \object $object = null) : void
-{
-    EventDispatcher::dispatchAsync($eventName, $object);
 }

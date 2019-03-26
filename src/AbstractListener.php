@@ -25,14 +25,14 @@ abstract class AbstractListener implements ListenerInterface
     protected $data;
 
     /**
-     * @var \object|null
+     * @var object|null
      */
     protected $object;
 
     /**
      * @param object|null $object
      */
-    public function setObject(?\object $object) : void
+    public function setObject(?object $object) : void
     {
         $this->object = $object;
     }

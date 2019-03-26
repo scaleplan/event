@@ -17,5 +17,5 @@ interface ListenerInterface
     /**
      * @param object|null $object
      */
-    public function setObject(?\object $object) : void;
+    public function setObject(?object $object) : void;
 }
