@@ -54,7 +54,7 @@ class AbstractEvent implements EventInterface
      */
     public static function dispatch(?object $object) : void
     {
-        uasort(static::$listeners, function (int $a, int $b) {
+        uasort(static::$listeners, static function (int $a, int $b) {
             return ($a[static::PRIORITY_LABEL] <=> $b[static::PRIORITY_LABEL]);
         });
         foreach (static::$listeners as $class => $data) {

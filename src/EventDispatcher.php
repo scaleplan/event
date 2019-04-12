@@ -56,7 +56,7 @@ class EventDispatcher
      */
     public static function dispatchAsync(string $className, object $object = null) : void
     {
-        register_shutdown_function(function () use ($className, $object) {
+        register_shutdown_function(static function () use ($className, $object) {
             /** @var EventInterface $className */
             $className::dispatch($object);
         });
