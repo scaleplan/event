@@ -15,7 +15,7 @@ use Scaleplan\Kafka\Kafka;
  */
 abstract class AbstractListener implements ListenerInterface
 {
-    public const NAME = 'Abstract';
+    public const EVENT_NAME = 'Abstract';
 
     public const KAFKA_TOPIC = null;
 
@@ -80,7 +80,5 @@ abstract class AbstractListener implements ListenerInterface
     /**
      * Event handler priority executor
      */
-    public function handler() : void
-    {
-    }
+    abstract public function handler() : void;
 }

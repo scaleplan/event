@@ -34,6 +34,10 @@ class AbstractEvent implements EventInterface
      */
     public static function addListener(string $className, string $priority, array $data = []) : void
     {
+        if (array_key_exists($className, static::$listeners)) {
+            return;
+        }
+
         if (!class_exists($className) || !is_subclass_of($className, ListenerInterface::class)) {
             throw new ClassNotImplementsListenerInterfaceException($className);
         }

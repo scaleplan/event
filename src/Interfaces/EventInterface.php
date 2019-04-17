@@ -21,5 +21,8 @@ interface EventInterface
      */
     public static function removeListener(string $className) : void;
 
+    /**
+     * @param object|null $object
+     */
     public static function dispatch(?object $object) : void;
 }
