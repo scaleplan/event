@@ -10,6 +10,7 @@ namespace Scaleplan\Event\Exceptions;
 class ClassNotImplementsException extends AbstractException
 {
     public const MESSAGE = 'Class :class must implements required interface.';
+    public const CODE = 406;
 
     /**
      * ClassIsNotEventException constructor.

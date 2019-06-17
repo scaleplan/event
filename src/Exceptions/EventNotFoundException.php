@@ -10,6 +10,7 @@ namespace Scaleplan\Event\Exceptions;
 class EventNotFoundException extends AbstractException
 {
     public const MESSAGE = 'Class :event not found.';
+    public const CODE = 404;
 
     /**
      * EventNotFoundException constructor.

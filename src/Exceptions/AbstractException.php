@@ -10,6 +10,7 @@ namespace Scaleplan\Event\Exceptions;
 class AbstractException extends \Exception
 {
     public const MESSAGE = 'Event error.';
+    public const CODE = 400;
 
     /**
      * KafkaException constructor.
@@ -19,6 +20,6 @@ class AbstractException extends \Exception
      */
     public function __construct(int $code = 0, \Throwable $previous = null)
     {
-        parent::__construct(static::MESSAGE, $code, $previous);
+        parent::__construct(static::MESSAGE, $code ?: static::CODE, $previous);
     }
 }
