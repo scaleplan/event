@@ -39,26 +39,26 @@ class EventDispatcher
 
     /**
      * @param string $className
-     * @param object|null $object
+     * @param array $data
      *
      * @throws ClassNotImplementsEventInterfaceException
      */
-    public static function dispatch(string $className, object $object = null) : void
+    public static function dispatch(string $className, array $data = []) : void
     {
         /** @var EventInterface $className */
         static::eventClassCheck($className);
-        $className::dispatch($object);
+        $className::dispatch($data);
     }
 
     /**
      * @param string $className
-     * @param object|null $object
+     * @param array $data
      */
-    public static function dispatchAsync(string $className, object $object = null) : void
+    public static function dispatchAsync(string $className, array $data = []) : void
     {
-        register_shutdown_function(static function () use ($className, $object) {
+        register_shutdown_function(static function () use ($className, $data) {
             /** @var EventInterface $className */
-            $className::dispatch($object);
+            $className::dispatch($data);
         });
     }
 }

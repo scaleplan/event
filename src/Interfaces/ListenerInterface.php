@@ -10,12 +10,12 @@ namespace Scaleplan\Event\Interfaces;
 interface ListenerInterface
 {
     /**
+     * @param array $data
+     */
+    public function setData(array $data) : void;
+
+    /**
      * Event handler priority executor
      */
     public function handler() : void;
-
-    /**
-     * @param object|null $object
-     */
-    public function setObject(?object $object) : void;
 }

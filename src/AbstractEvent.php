@@ -32,7 +32,7 @@ class AbstractEvent implements EventInterface
      *
      * @throws ClassNotImplementsListenerInterfaceException
      */
-    public static function addListener(string $className, string $priority, array $data = []) : void
+    public static function addListener(string $className, string $priority = self::PRIORY_LOW, array $data = []) : void
     {
         if (array_key_exists($className, static::$listeners)) {
             return;
@@ -54,17 +54,17 @@ class AbstractEvent implements EventInterface
     }
 
     /**
-     * @param object|null $object
+     * @param array $data
      */
-    public static function dispatch(?object $object) : void
+    public static function dispatch(array $data = []) : void
     {
         uasort(static::$listeners, static function (int $a, int $b) {
             return ($a[static::PRIORITY_LABEL] <=> $b[static::PRIORITY_LABEL]);
         });
-        foreach (static::$listeners as $class => $data) {
+        foreach (static::$listeners as $class => $initData) {
             /** @var ListenerInterface $listener */
-            $listener = new $class(...$data);
-            $listener->setObject($object);
+            $listener = new $class();
+            $listener->setData(array_merge($initData, $data));
             $listener->handler();
         }
     }

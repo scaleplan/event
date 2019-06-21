@@ -22,7 +22,7 @@ interface EventInterface
     public static function removeListener(string $className) : void;
 
     /**
-     * @param object|null $object
+     * @param array $data
      */
-    public static function dispatch(?object $object) : void;
+    public static function dispatch(array $data = []) : void;
 }

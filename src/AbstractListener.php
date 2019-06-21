@@ -6,6 +6,7 @@ use Lmc\HttpConstants\Header;
 use Scaleplan\Event\Exceptions\DataNotSupportedException;
 use Scaleplan\Event\Interfaces\ListenerInterface;
 use Scaleplan\Http\Request;
+use Scaleplan\InitTrait\InitTrait;
 use Scaleplan\Kafka\Kafka;
 
 /**
@@ -15,6 +16,8 @@ use Scaleplan\Kafka\Kafka;
  */
 abstract class AbstractListener implements ListenerInterface
 {
+    use InitTrait;
+
     public const EVENT_NAME = 'Abstract';
 
     public const KAFKA_TOPIC = null;
@@ -25,16 +28,12 @@ abstract class AbstractListener implements ListenerInterface
     protected $data;
 
     /**
-     * @var object|null
+     * @param array $data
      */
-    protected $object;
-
-    /**
-     * @param object|null $object
-     */
-    public function setObject(?object $object) : void
+    public function setData(array $data = []) : void
     {
-        $this->object = $object;
+        $this->data = $data;
+        $this->initObject($data);
     }
 
     /**
@@ -47,7 +46,7 @@ abstract class AbstractListener implements ListenerInterface
      */
     protected function sendByHttp(string $url, string $token = null) : void
     {
-        $content = ['event' => static::NAME, 'data' => $this->data];
+        $content = ['event' => static::EVENT_NAME, 'data' => $this->data];
 
         $request = new Request($url, $content);
         if ($token) {
@@ -60,7 +59,7 @@ abstract class AbstractListener implements ListenerInterface
     protected function sendAsyncByKafka() : void
     {
         $kafka = Kafka::getInstance();
-        $kafka->produce(static::KAFKA_TOPIC ?? static::NAME, $this->data);
+        $kafka->produce(static::KAFKA_TOPIC ?? static::EVENT_NAME, $this->data);
     }
 
     /**
@@ -74,7 +73,7 @@ abstract class AbstractListener implements ListenerInterface
             throw new DataNotSupportedException();
         }
 
-        $connection->exec('NOTIFY ' . static::NAME);
+        $connection->exec('NOTIFY ' . static::EVENT_NAME);
     }
 
     /**

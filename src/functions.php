@@ -6,20 +6,20 @@ use Scaleplan\Event\Exceptions\ClassNotImplementsEventInterfaceException;
 
 /**
  * @param string $eventName
- * @param object|null $object
+ * @param array $data
  *
  * @throws ClassNotImplementsEventInterfaceException
  */
-function dispatch(string $eventName, object $object = null) : void
+function dispatch(string $eventName, array $data = []) : void
 {
-    EventDispatcher::dispatch($eventName, $object);
+    EventDispatcher::dispatch($eventName, $data);
 }
 
 /**
  * @param string $eventName
- * @param object|null $object
+ * @param array $data
  */
-function dispatch_async(string $eventName, object $object = null) : void
+function dispatch_async(string $eventName, array $data = []) : void
 {
-    EventDispatcher::dispatchAsync($eventName, $object);
+    EventDispatcher::dispatchAsync($eventName, $data);
 }
