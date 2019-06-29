@@ -37,6 +37,36 @@ abstract class AbstractListener implements ListenerInterface
     }
 
     /**
+     * @return array
+     */
+    protected function getDataAsStringArray() : array
+    {
+        return \array_map(static function ($item) {
+            if (\is_object($item)) {
+                $item = (string)$item;
+            }
+
+            return $item;
+        }, $this->data);
+    }
+
+    /**
+     * @return string
+     */
+    protected function getDataAsString() : string
+    {
+        $data = \array_map(static function ($item) {
+            $json = json_decode($item, true);
+            return $json !== null || strtolower($item) === 'null' ? $json : $item;
+        }, $this->getDataAsStringArray());
+
+        return json_encode($data, JSON_OBJECT_AS_ARRAY | JSON_NUMERIC_CHECK | JSON_UNESCAPED_SLASHES
+            | JSON_UNESCAPED_UNICODE | JSON_PRESERVE_ZERO_FRACTION);
+    }
+
+    //protected function getDataAsStringArray
+
+    /**
      * @param string $url
      * @param string|null $token
      *
@@ -46,7 +76,7 @@ abstract class AbstractListener implements ListenerInterface
      */
     protected function sendByHttp(string $url, string $token = null) : void
     {
-        $content = ['event' => static::EVENT_NAME, 'data' => $this->data];
+        $content = ['event' => static::EVENT_NAME, 'data' => $this->getDataAsStringArray()];
 
         $request = new Request($url, $content);
         if ($token) {
@@ -59,7 +89,7 @@ abstract class AbstractListener implements ListenerInterface
     protected function sendAsyncByKafka() : void
     {
         $kafka = Kafka::getInstance();
-        $kafka->produce(static::KAFKA_TOPIC ?? static::EVENT_NAME, $this->data);
+        $kafka->produce(static::KAFKA_TOPIC ?? static::EVENT_NAME, $this->getDataAsString());
     }
 
     /**
@@ -73,7 +103,7 @@ abstract class AbstractListener implements ListenerInterface
             throw new DataNotSupportedException();
         }
 
-        $connection->exec('NOTIFY ' . static::EVENT_NAME);
+        $connection->exec('NOTIFY ' . static::EVENT_NAME . ", '{$this->getDataAsString()}'");
     }
 
     /**
