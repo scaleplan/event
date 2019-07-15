@@ -18,6 +18,8 @@ function dispatch(string $eventName, array $data = []) : void
 /**
  * @param string $eventName
  * @param array $data
+ *
+ * @throws ClassNotImplementsEventInterfaceException
  */
 function dispatch_async(string $eventName, array $data = []) : void
 {

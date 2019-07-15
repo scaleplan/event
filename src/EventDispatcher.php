@@ -53,9 +53,12 @@ class EventDispatcher
     /**
      * @param string $className
      * @param array $data
+     *
+     * @throws ClassNotImplementsEventInterfaceException
      */
     public static function dispatchAsync(string $className, array $data = []) : void
     {
+        static::eventClassCheck($className);
         register_shutdown_function(static function () use ($className, $data) {
             /** @var EventInterface $className */
             $className::dispatch($data);
