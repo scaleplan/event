@@ -22,6 +22,8 @@ abstract class AbstractListener implements ListenerInterface
 
     public const KAFKA_TOPIC = null;
 
+    protected $priority = AbstractEvent::PRIORY_LOW;
+
     /**
      * @var array
      */
@@ -32,8 +34,7 @@ abstract class AbstractListener implements ListenerInterface
      */
     public function setData(array $data = []) : void
     {
-        $this->data = $data;
-        $this->initObject($data);
+        $this->data = $this->initObject($data);
     }
 
     /**
