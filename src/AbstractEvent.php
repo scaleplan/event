@@ -15,6 +15,7 @@ class AbstractEvent implements EventInterface
 {
     protected const PRIORITY_LABEL = 'priority';
     protected const DATA_LABEL     = 'data';
+    protected const CALLBACK_LABEL = 'callback';
 
     public const PRIORY_HIGH   = 0;
     public const PRIORY_MEDIUM = 1;
@@ -46,11 +47,26 @@ class AbstractEvent implements EventInterface
     }
 
     /**
-     * @param string $className
+     * @param string $alias
+     * @param callable $callback
+     * @param string $priority
+     * @param array $data
      */
-    public static function removeListener(string $className) : void
+    public static function addCallbackListener(string $alias, callable $callback, string $priority = self::PRIORY_LOW, array $data = []) : void
     {
-        unset(static::$listeners[$className]);
+        if (array_key_exists($alias, static::$listeners)) {
+            return;
+        }
+
+        static::$listeners[$alias] = [static::CALLBACK_LABEL => $callback, static::PRIORITY_LABEL => $priority];
+    }
+
+    /**
+     * @param string $classNameOrAlias
+     */
+    public static function removeListener(string $classNameOrAlias) : void
+    {
+        unset(static::$listeners[$classNameOrAlias]);
     }
 
     /**
@@ -61,9 +77,14 @@ class AbstractEvent implements EventInterface
         uasort(static::$listeners, static function ($a, $b) {
             return ($a[static::PRIORITY_LABEL] <=> $b[static::PRIORITY_LABEL]);
         });
-        foreach (static::$listeners as $class => $initData) {
+        foreach (static::$listeners as $name => $initData) {
+            $callback = $initData[static::CALLBACK_LABEL] ?? null;
+            if (isset($callback) && is_callable($callback)) {
+                $callback();
+            }
+
             /** @var ListenerInterface $listener */
-            $listener = new $class();
+            $listener = new $name();
             $listener->setData(array_merge($initData, $data));
             $listener->handler();
         }

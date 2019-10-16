@@ -4,6 +4,7 @@ namespace Scaleplan\Event;
 
 use Scaleplan\Event\Exceptions\ClassNotImplementsEventInterfaceException;
 use Scaleplan\Event\Interfaces\EventInterface;
+use Scaleplan\Http\Hooks\SendError;
 
 /**
  * Class EventDispatcher
@@ -60,8 +61,12 @@ class EventDispatcher
     {
         static::eventClassCheck($className);
         register_shutdown_function(static function () use ($className, $data) {
-            /** @var EventInterface $className */
-            $className::dispatch($data);
+            try {
+                /** @var EventInterface $className */
+                $className::dispatch($data);
+            } catch (\Throwable $e) {
+                SendError::dispatch(['exception' => $e,]);
+            }
         });
     }
 }
