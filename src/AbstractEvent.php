@@ -50,9 +50,12 @@ class AbstractEvent implements EventInterface
      * @param string $alias
      * @param callable $callback
      * @param string $priority
-     * @param array $data
      */
-    public static function addCallbackListener(string $alias, callable $callback, string $priority = self::PRIORY_LOW, array $data = []) : void
+    public static function addCallbackListener(
+        string $alias,
+        callable $callback,
+        string $priority = self::PRIORY_LOW
+    ) : void
     {
         if (array_key_exists($alias, static::$listeners)) {
             return;
