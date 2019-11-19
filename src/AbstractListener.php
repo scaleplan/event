@@ -71,9 +71,7 @@ abstract class AbstractListener implements ListenerInterface
      * @param string $url
      * @param string|null $token
      *
-     * @throws \Scaleplan\DTO\Exceptions\ValidationException
-     * @throws \Scaleplan\Http\Exceptions\HttpException
-     * @throws \Scaleplan\Http\Exceptions\RemoteServiceNotAvailableException
+     * @throws \Throwable
      */
     protected function sendByHttp(string $url, string $token = null) : void
     {
