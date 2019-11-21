@@ -8,6 +8,7 @@ use Scaleplan\Event\Interfaces\ListenerInterface;
 use Scaleplan\Http\Request;
 use Scaleplan\InitTrait\InitTrait;
 use Scaleplan\Kafka\Kafka;
+use Scaleplan\Result\Interfaces\ArrayResultInterface;
 
 /**
  * Class AbstractListener
@@ -25,7 +26,7 @@ abstract class AbstractListener implements ListenerInterface
     protected $priority = AbstractEvent::PRIORY_LOW;
 
     /**
-     * @var array
+     * @var mixed
      */
     protected $data;
 
@@ -34,7 +35,10 @@ abstract class AbstractListener implements ListenerInterface
      */
     public function setData(array $data = []) : void
     {
-        $this->data = $this->initObject($data);
+        $otherData = $this->initObject($data);
+        if ($otherData) {
+            $this->data = $otherData;
+        }
     }
 
     /**
@@ -42,13 +46,22 @@ abstract class AbstractListener implements ListenerInterface
      */
     protected function getDataAsStringArray() : array
     {
+        $data = [];
+        if ($this->data instanceof ArrayResultInterface) {
+            $data = $this->data->getResult();
+        }
+
+        if (is_array($this->data)) {
+            $data = $this->data;
+        }
+
         return \array_map(static function ($item) {
             if (\is_object($item)) {
                 $item = (string)$item;
             }
 
             return $item;
-        }, $this->data);
+        }, $data);
     }
 
     /**
