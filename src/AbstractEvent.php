@@ -27,6 +27,16 @@ class AbstractEvent implements EventInterface
     protected static $listeners = [];
 
     /**
+     * @param string $eventName
+     *
+     * @return array
+     */
+    public static function getListeners(string $eventName) : array
+    {
+        return self::$listeners[$eventName] ?? [];
+    }
+
+    /**
      * @param string $className
      * @param string $priority
      * @param array $data
@@ -35,7 +45,8 @@ class AbstractEvent implements EventInterface
      */
     public static function addListener(string $className, string $priority = self::PRIORY_LOW, array $data = []) : void
     {
-        if (array_key_exists($className, static::$listeners)) {
+        $eventName = static::class;
+        if (array_key_exists($className, static::getListeners($eventName))) {
             return;
         }
 
@@ -43,7 +54,7 @@ class AbstractEvent implements EventInterface
             throw new ClassNotImplementsListenerInterfaceException($className);
         }
 
-        static::$listeners[$className] = [static::DATA_LABEL => $data, static::PRIORITY_LABEL => $priority];
+        static::$listeners[$eventName][$className] = [static::DATA_LABEL => $data, static::PRIORITY_LABEL => $priority];
     }
 
     /**
@@ -57,11 +68,12 @@ class AbstractEvent implements EventInterface
         string $priority = self::PRIORY_LOW
     ) : void
     {
-        if (array_key_exists($alias, static::$listeners)) {
+        $eventName = static::class;
+        if (array_key_exists($alias, static::getListeners($eventName))) {
             return;
         }
 
-        static::$listeners[$alias] = [static::CALLBACK_LABEL => $callback, static::PRIORITY_LABEL => $priority];
+        static::$listeners[$eventName][$alias] = [static::CALLBACK_LABEL => $callback, static::PRIORITY_LABEL => $priority];
     }
 
     /**
@@ -69,7 +81,8 @@ class AbstractEvent implements EventInterface
      */
     public static function removeListener(string $classNameOrAlias) : void
     {
-        unset(static::$listeners[$classNameOrAlias]);
+        $eventName = static::class;
+        unset(static::$listeners[$eventName][$classNameOrAlias]);
     }
 
     /**
@@ -77,10 +90,12 @@ class AbstractEvent implements EventInterface
      */
     public static function dispatch(array $data = []) : void
     {
-        uasort(static::$listeners, static function ($a, $b) {
+        $eventName = static::class;
+        $listeners = static::getListeners($eventName);
+        uasort($listeners, static function ($a, $b) {
             return ($a[static::PRIORITY_LABEL] <=> $b[static::PRIORITY_LABEL]);
         });
-        foreach (static::$listeners as $name => $initData) {
+        foreach ($listeners as $name => $initData) {
             $callback = $initData[static::CALLBACK_LABEL] ?? null;
             if (isset($callback) && is_callable($callback)) {
                 $callback();
