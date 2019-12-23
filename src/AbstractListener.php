@@ -1,12 +1,13 @@
 <?php
+declare(strict_types=1);
 
 namespace Scaleplan\Event;
 
 use Lmc\HttpConstants\Header;
 use Scaleplan\Event\Exceptions\DataNotSupportedException;
 use Scaleplan\Event\Interfaces\ListenerInterface;
+use Scaleplan\Helpers\NameConverter;
 use Scaleplan\Http\Request;
-use Scaleplan\InitTrait\InitTrait;
 use Scaleplan\Kafka\Kafka;
 use Scaleplan\Result\Interfaces\ArrayResultInterface;
 
@@ -17,8 +18,6 @@ use Scaleplan\Result\Interfaces\ArrayResultInterface;
  */
 abstract class AbstractListener implements ListenerInterface
 {
-    use InitTrait;
-
     public const EVENT_NAME = 'Abstract';
 
     public const KAFKA_TOPIC = null;
@@ -29,6 +28,48 @@ abstract class AbstractListener implements ListenerInterface
      * @var mixed
      */
     protected $data;
+
+    /**
+     * Установка значений свойств в контексте объекта
+     *
+     * @param array $settings - массив свойства в формате 'имя' => 'значение'
+     *
+     * @return array
+     */
+    protected function initObject(array $settings) : array
+    {
+        foreach ($settings as $name => &$value) {
+            $propertyName = null;
+            if (property_exists($this, $name)) {
+                $propertyName = $name;
+                unset($settings[$name]);
+            }
+
+            if ($propertyName !== null
+                && property_exists($this, NameConverter::snakeCaseToLowerCamelCase($name))) {
+                $propertyName = NameConverter::snakeCaseToLowerCamelCase($name);
+                unset($settings[$name]);
+            }
+
+            if (!$propertyName) {
+                continue;
+            }
+
+            $methodName = 'set' . ucfirst($propertyName);
+            if (is_callable([$this, $methodName])) {
+                $this->{$methodName}($value);
+                continue;
+            }
+
+            if (property_exists($this, $propertyName)) {
+                $this->{$propertyName} = $value;
+            }
+        }
+
+        unset($value);
+
+        return $settings;
+    }
 
     /**
      * @param array $data

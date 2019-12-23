@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Scaleplan\Event;
 
@@ -99,6 +100,7 @@ class AbstractEvent implements EventInterface
             $callback = $initData[static::CALLBACK_LABEL] ?? null;
             if (isset($callback) && is_callable($callback)) {
                 $callback();
+                return;
             }
 
             /** @var ListenerInterface $listener */
