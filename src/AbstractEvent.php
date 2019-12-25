@@ -39,12 +39,12 @@ class AbstractEvent implements EventInterface
 
     /**
      * @param string $className
-     * @param string $priority
+     * @param int $priority
      * @param array $data
      *
      * @throws ClassNotImplementsListenerInterfaceException
      */
-    public static function addListener(string $className, string $priority = self::PRIORY_LOW, array $data = []) : void
+    public static function addListener(string $className, int $priority = self::PRIORY_LOW, array $data = []) : void
     {
         $eventName = static::class;
         if (array_key_exists($className, static::getListeners($eventName))) {
@@ -61,12 +61,12 @@ class AbstractEvent implements EventInterface
     /**
      * @param string $alias
      * @param callable $callback
-     * @param string $priority
+     * @param int $priority
      */
     public static function addCallbackListener(
         string $alias,
         callable $callback,
-        string $priority = self::PRIORY_LOW
+        int $priority = self::PRIORY_LOW
     ) : void
     {
         $eventName = static::class;

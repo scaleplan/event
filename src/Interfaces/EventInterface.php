@@ -11,10 +11,10 @@ interface EventInterface
 {
     /**
      * @param string $className
-     * @param string $priority
+     * @param int $priority
      * @param array $data
      */
-    public static function addListener(string $className, string $priority, array $data = []) : void;
+    public static function addListener(string $className, int $priority, array $data = []) : void;
 
     /**
      * @param string $className
