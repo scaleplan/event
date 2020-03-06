@@ -33,22 +33,26 @@ abstract class AbstractListener implements ListenerInterface
      * Установка значений свойств в контексте объекта
      *
      * @param array $settings - массив свойства в формате 'имя' => 'значение'
-     *
-     * @return array
      */
-    protected function initObject(array $settings) : array
+    protected function initObject(array $settings) : void
     {
+        $this->data = $settings;
         foreach ($settings as $name => &$value) {
+            if ($name === 'data') {
+                $this->data = $value;
+                continue;
+            }
+
             $propertyName = null;
             if (property_exists($this, $name)) {
                 $propertyName = $name;
-                unset($settings[$name]);
+                unset($this->data[$name]);
             }
 
             if ($propertyName !== null
                 && property_exists($this, NameConverter::snakeCaseToLowerCamelCase($name))) {
                 $propertyName = NameConverter::snakeCaseToLowerCamelCase($name);
-                unset($settings[$name]);
+                unset($this->data[$name]);
             }
 
             if (!$propertyName) {
@@ -67,8 +71,6 @@ abstract class AbstractListener implements ListenerInterface
         }
 
         unset($value);
-
-        return $settings;
     }
 
     /**
@@ -76,10 +78,7 @@ abstract class AbstractListener implements ListenerInterface
      */
     public function setData(array $data = []) : void
     {
-        $otherData = $this->initObject($data);
-        if ($otherData) {
-            $this->data = $otherData;
-        }
+        $this->initObject($data);
     }
 
     /**
