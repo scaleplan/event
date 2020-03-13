@@ -30,6 +30,32 @@ abstract class AbstractListener implements ListenerInterface
     protected $data;
 
     /**
+     * AbstractListener constructor.
+     *
+     * @param array|mixed $data
+     */
+    public function __construct($data = [])
+    {
+        $this->setData($data);
+    }
+
+    /**
+     * @return int
+     */
+    public function getPriority() : int
+    {
+        return $this->priority;
+    }
+
+    /**
+     * @param int $priority
+     */
+    public function setPriority(int $priority) : void
+    {
+        $this->priority = $priority;
+    }
+
+    /**
      * Установка значений свойств в контексте объекта
      *
      * @param array $settings - массив свойства в формате 'имя' => 'значение'
@@ -38,18 +64,13 @@ abstract class AbstractListener implements ListenerInterface
     {
         $this->data = $settings;
         foreach ($settings as $name => &$value) {
-            if ($name === 'data') {
-                $this->data = $value;
-                continue;
-            }
-
             $propertyName = null;
             if (property_exists($this, $name)) {
                 $propertyName = $name;
                 unset($this->data[$name]);
             }
 
-            if ($propertyName !== null
+            if ($propertyName === null
                 && property_exists($this, NameConverter::snakeCaseToLowerCamelCase($name))) {
                 $propertyName = NameConverter::snakeCaseToLowerCamelCase($name);
                 unset($this->data[$name]);
@@ -74,11 +95,16 @@ abstract class AbstractListener implements ListenerInterface
     }
 
     /**
-     * @param array $data
+     * @param $data
      */
-    public function setData(array $data = []) : void
+    public function setData($data) : void
     {
-        $this->initObject($data);
+        if (is_array($data)) {
+            $this->initObject($data);
+            return;
+        }
+
+        $this->data = $data;
     }
 
     /**

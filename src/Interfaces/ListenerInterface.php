@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Scaleplan\Event\Interfaces;
 
@@ -9,6 +10,23 @@ namespace Scaleplan\Event\Interfaces;
  */
 interface ListenerInterface
 {
+    /**
+     * ListenerInterface constructor.
+     *
+     * @param array|mixed $data
+     */
+    public function __construct($data = []);
+
+    /**
+     * @return int
+     */
+    public function getPriority() : int;
+
+    /**
+     * @param int $priority
+     */
+    public function setPriority(int $priority) : void;
+
     /**
      * @param array $data
      */
