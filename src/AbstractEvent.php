@@ -105,10 +105,6 @@ class AbstractEvent implements EventInterface
 
             /** @var ListenerInterface $listener */
             $listener = new $name(array_merge($initData[static::DATA_LABEL] ?? [], $data));
-            if (isset($initData[static::PRIORITY_LABEL])) {
-                $listener->setPriority($initData[static::PRIORITY_LABEL]);
-            }
-
             //$listener->setData(array_merge($initData[static::DATA_LABEL] ?? [], $data));
             $listener->handler();
         }
