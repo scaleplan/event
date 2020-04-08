@@ -16,15 +16,7 @@ class EventDispatcher
     /**
      * @var array
      */
-    protected static $events = [];
-
-    /**
-     * @param array $events
-     */
-    public static function init(array $events) : void
-    {
-        static::$events = $events;
-    }
+    protected static $asyncEvents = [];
 
     /**
      * @param string $className
@@ -60,13 +52,21 @@ class EventDispatcher
     public static function dispatchAsync(string $className, array $data = []) : void
     {
         static::eventClassCheck($className);
-        register_shutdown_function(static function () use ($className, $data) {
+        static::$asyncEvents[] = static function () use ($className, $data) {
             try {
                 /** @var EventInterface $className */
                 $className::dispatch($data);
             } catch (\Throwable $e) {
                 SendError::dispatch(['exception' => $e,]);
             }
-        });
+        };
+    }
+
+    /**
+     * @return array
+     */
+    public static function getAsyncEvents() : array
+    {
+        return self::$asyncEvents;
     }
 }

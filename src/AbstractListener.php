@@ -144,8 +144,6 @@ abstract class AbstractListener implements ListenerInterface
             | JSON_UNESCAPED_UNICODE | JSON_PRESERVE_ZERO_FRACTION);
     }
 
-    //protected function getDataAsStringArray
-
     /**
      * @param string $url
      * @param string|null $token
