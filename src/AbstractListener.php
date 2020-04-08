@@ -62,27 +62,18 @@ abstract class AbstractListener implements ListenerInterface
      */
     protected function initObject(array $settings) : void
     {
-        $this->data = $settings;
         foreach ($settings as $name => &$value) {
             $propertyName = null;
             if (property_exists($this, $name)) {
                 $propertyName = $name;
-                unset($this->data[$name]);
             }
 
             if ($propertyName === null
                 && property_exists($this, NameConverter::snakeCaseToLowerCamelCase($name))) {
                 $propertyName = NameConverter::snakeCaseToLowerCamelCase($name);
-                unset($this->data[$name]);
             }
 
             if (!$propertyName) {
-                continue;
-            }
-
-            $methodName = 'set' . ucfirst($propertyName);
-            if (is_callable([$this, $methodName])) {
-                $this->{$methodName}($value);
                 continue;
             }
 
