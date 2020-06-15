@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Scaleplan\Event\Exceptions;
 
-use Scaleplan\Event\Interfaces\ListenerInterface;
+use Scaleplan\Event\Interfaces\EventInterface;
 
 /**
  * Class ClassNotImplementsEventInterfaceException
@@ -12,6 +12,6 @@ use Scaleplan\Event\Interfaces\ListenerInterface;
  */
 class ClassNotImplementsEventInterfaceException extends ClassNotImplementsException
 {
-    public const MESSAGE = 'Class :class must implements ' . ListenerInterface::class;
-    public const CODE = 406;
+    public const MESSAGE = 'Класс :class должен реализовывать ' . EventInterface::class;
+    public const CODE    = 406;
 }

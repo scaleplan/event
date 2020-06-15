@@ -10,7 +10,7 @@ namespace Scaleplan\Event\Exceptions;
  */
 abstract class AbstractException extends \Exception
 {
-    public const MESSAGE = 'Event error.';
+    public const MESSAGE = 'Ошибка события.';
     public const CODE = 400;
 
     /**

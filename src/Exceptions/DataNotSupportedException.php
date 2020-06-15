@@ -10,6 +10,6 @@ namespace Scaleplan\Event\Exceptions;
  */
 class DataNotSupportedException extends AbstractException
 {
-    public const MESSAGE = 'Notify to database with data sending not supported.';
+    public const MESSAGE = 'Отправка уведомления с дополнительной информацией в базу данных не поддерживается.';
     public const CODE = 406;
 }

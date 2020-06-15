@@ -10,7 +10,7 @@ namespace Scaleplan\Event\Exceptions;
  */
 class ListenerException extends AbstractException
 {
-    public const MESSAGE = 'Listener error.';
+    public const MESSAGE = 'Ошибка слушателя события.';
     public const CODE    = 500;
 
     /**
