@@ -52,7 +52,7 @@ class AbstractEvent implements EventInterface
         }
 
         if (!class_exists($className) || !is_subclass_of($className, ListenerInterface::class)) {
-            throw new ClassNotImplementsListenerInterfaceException($className);
+            throw new ClassNotImplementsListenerInterfaceException($className, ListenerInterface::class);
         }
 
         static::$listeners[$eventName][$className] = [static::DATA_LABEL => $data, static::PRIORITY_LABEL => $priority];

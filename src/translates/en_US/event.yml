@@ -1,0 +1,8 @@
+event-error: Event error.
+must-implements-listener-interface: Class :class must implements :listener-interface.
+must-implements: Class :class must implements requested interface.
+must-implements-event-interface: Class :class must implements :event-interface.
+db-notify-not-supported: Send notify to database not supported.
+class-not-found: Class :event not found.
+event-send-error: Event send error.
+listener-error: Event listener error.

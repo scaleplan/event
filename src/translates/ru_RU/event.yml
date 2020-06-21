@@ -1,0 +1,6 @@
+event-error: Ошибка события.
+must-implements: Класс :class должен реализовывать :listener-interface.
+db-notify-not-supported: Отправка уведомления с дополнительной информацией в базу данных не поддерживается.
+class-not-found: Класс :event не найден.
+event-send-error: Ошибка отправки события.
+listener-error: Ошибка слушателя события.

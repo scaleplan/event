@@ -10,6 +10,6 @@ namespace Scaleplan\Event\Exceptions;
  */
 class EventSendException extends AbstractException
 {
-    public const MESSAGE = 'Ошибка отправки события.';
+    public const MESSAGE = 'event.event-send-error';
     public const CODE = 500;
 }

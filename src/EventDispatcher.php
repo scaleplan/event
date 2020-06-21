@@ -26,7 +26,7 @@ class EventDispatcher
     protected static function eventClassCheck(string $className) : void
     {
         if (!class_exists($className) || !is_subclass_of($className, EventInterface::class)) {
-            throw new ClassNotImplementsEventInterfaceException($className);
+            throw new ClassNotImplementsEventInterfaceException($className, EventInterface::class);
         }
     }
 
